@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính toán pha chế vàng</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: normal;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .weight-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .add-btn {
+            background-color: #4CAF50;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .add-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .remove-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .remove-btn:hover {
+            background-color: #da190b;
+        }
+        
+        .target-section {
+            background-color: #e8f5e9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .target-input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .target-input-group label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .target-input-group input {
+            width: 150px;
+        }
+        
+        .result-table {
+            margin-top: 20px;
+        }
+        
+        .result-table th {
+            background-color: #ff9800;
+        }
+        
+        .result-table td {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .warning {
+            color: #ff5722;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        .number-col {
+            width: 50px;
+        }
+        
+        .weight-col {
+            width: 35%;
+        }
+        
+        .purity-col {
+            width: 25%;
+        }
+        
+        .action-col {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TÍNH TOÁN PHA CHẾ VÀNG</h1>
+        
+        <div class="input-section">
+            <div class="section-title">Thông tin vàng gốc</div>
+            <table id="goldTable">
+                <thead>
+                    <tr>
+                        <th class="number-col center">STT</th>
+                        <th class="weight-col">Trọng lượng (gem)</th>
+                        <th class="purity-col">Tuổi vàng (1-9999)</th>
+                        <th class="action-col center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="goldTableBody">
+                    <tr>
+                        <td class="center">1</td>
+                        <td>
+                            <input type="number" class="weight-input" placeholder="Nhập trọng lượng" min="0" step="1">
+                            <div class="weight-desc">0</div>
+                        </td>
+                        <td>
+                            <input type="number" class="purity-input" placeholder="Nhập tuổi" min="1" max="9999" step="1">
+                                <div class="weight-desc">0</div>
+                        </td>
+                        <td class="center">
+                            <button class="btn remove-btn" onclick="removeGoldItem(this)" style="display: none;">Xóa</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button class="btn add-btn" onclick="addGoldItem()">+ Thêm thỏi vàng</button>
+        </div>
+        
+        <div class="target-section">
+            <div class="target-input-group">
+                <label for="targetPurity">Tuổi vàng mong muốn:</label>
+                <input type="number" id="targetPurity" value="9950" min="1" max="9999" step="1">
+            </div>
+        </div>
+        
+        <div class="section-title">Kết quả tính toán</div>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>Thông số</th>
+                    <th>Giá trị</th>
+                </tr>
+            </thead>
+            <tbody id="resultTableBody">
+                <tr>
+                    <td>Tổng trọng lượng gốc</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Tuổi gốc (trung bình)</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Tuổi sau pha chế</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Lượng bạc cần thêm vào</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Tổng trọng lượng sau pha chế</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div id="warningDiv"></div>
+    </div>
+
+    <script>
+        // Hàm format số với dấu phẩy
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        // Hàm chuyển đổi gem sang chỉ và format
+        function gemToChiFormat(gem) {
+            const chi = Math.floor(gem / 1000);
+            const phan = Math.floor((gem % 1000) / 100);
+            const ly = Math.floor((gem % 100) / 10);
+            const gemRemain = gem % 10;
+            
+            let result = formatNumber(gem) + " gem = ";
+            
+            if (chi > 0) {
+                result += chi + " chỉ";
+                if (phan > 0 || ly > 0 || gemRemain > 0) {
+                    result += " ";
+                }
+            }
+            
+            if (phan > 0) {
+                result += phan + " phân";
+                if (ly > 0 || gemRemain > 0) {
+                    result += " ";
+                }
+            }
+            
+            if (ly > 0) {
+                result += ly + " ly";
+                if (gemRemain > 0) {
+                    result += " ";
+                }
+            }
+            
+            if (gemRemain > 0) {
+                result += gemRemain + " gem";
+            }
+            
+            if (gem === 0) {
+                result = "0 gem";
+            }
+            
+            return result;
+        }
+        
+        // Hàm chuyển đổi gem sang tael
+        function gemToTael(gem) {
+            return (gem / 10000).toFixed(4);
+        }
+        
+        // Hàm thêm thỏi vàng mới
+        function addGoldItem() {
+            const tbody = document.getElementById('goldTableBody');
+            const rowCount = tbody.rows.length;
+            
+            const newRow = tbody.insertRow();
+            newRow.innerHTML = `
+                <td class="center">${rowCount + 1}</td>
+                <td>
+                    <input type="number" class="weight-input" placeholder="Nhập trọng lượng" min="0" step="1">
+                    <div class="weight-desc">0</div>
+                </td>
+                <td>
+                    <input type="number" class="purity-input" placeholder="Nhập tuổi" min="1" max="9999" step="1">
+                        <div class="weight-desc">0</div>
+                </td>
+                <td class="center">
+                    <button class="btn remove-btn" onclick="removeGoldItem(this)">Xóa</button>
+                </td>
+            `;
+            
+            // Thêm event listeners cho inputs mới
+            const weightInput = newRow.querySelector('.weight-input');
+            const purityInput = newRow.querySelector('.purity-input');
+            
+            weightInput.addEventListener('input', function() {
+                updateWeightDescription(this);
+                calculateResults();
+            });
+            
+            purityInput.addEventListener('input', calculateResults);
+            
+            updateRemoveButtons();
+        }
+        
+        // Hàm xóa thỏi vàng
+        function removeGoldItem(button) {
+            const row = button.closest('tr');
+            row.remove();
+            updateRowNumbers();
+            updateRemoveButtons();
+            calculateResults();
+        }
+        
+        // Cập nhật số thứ tự
+        function updateRowNumbers() {
+            const tbody = document.getElementById('goldTableBody');
+            const rows = tbody.rows;
+            
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].cells[0].textContent = i + 1;
+            }
+        }
+        
+        // Cập nhật hiển thị nút xóa
+        function updateRemoveButtons() {
+            const tbody = document.getElementById('goldTableBody');
+            const rows = tbody.rows;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const removeBtn = rows[i].querySelector('.remove-btn');
+                if (rows.length > 1) {
+                    removeBtn.style.display = 'inline-block';
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+            }
+        }
+        
+        // Cập nhật mô tả trọng lượng
+        function updateWeightDescription(input) {
+            const weight = parseFloat(input.value) || 0;
+            const desc = input.parentElement.querySelector('.weight-desc');
+            
+            if (weight > 0) {
+                desc.textContent = gemToChiFormat(weight);
+            } else {
+                desc.textContent = '';
+            }
+        }
+        
+        // Tính toán kết quả
+        function calculateResults() {
+            const tbody = document.getElementById('goldTableBody');
+            const rows = tbody.rows;
+            const targetPurity = parseFloat(document.getElementById('targetPurity').value) || 9950;
+            
+            let totalWeight = 0;
+            let weightedPuritySum = 0;
+            let validItems = 0;
+            
+            // Thu thập dữ liệu từ các thỏi vàng
+            for (let i = 0; i < rows.length; i++) {
+                const weight = parseFloat(rows[i].querySelector('.weight-input').value) || 0;
+                const purity = parseFloat(rows[i].querySelector('.purity-input').value) || 0;
+                
+                if (weight > 0 && purity > 0) {
+                    totalWeight += weight;
+                    weightedPuritySum += weight * purity;
+                    validItems++;
+                }
+            }
+            
+            const resultTbody = document.getElementById('resultTableBody');
+            const warningDiv = document.getElementById('warningDiv');
+            
+            if (validItems === 0) {
+                // Reset bảng kết quả
+                resultTbody.innerHTML = `
+                    <tr>
+                        <td>Tổng trọng lượng gốc</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Tuổi gốc (trung bình)</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Tuổi sau pha chế</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Lượng bạc cần thêm vào</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Tổng trọng lượng sau pha chế</td>
+                        <td>-</td>
+                    </tr>
+                `;
+                warningDiv.innerHTML = '';
+                return;
+            }
+            
+            // Tính tuổi trung bình
+            const averagePurity = weightedPuritySum / totalWeight;
+            
+            // Tính lượng bạc cần thêm
+            let silverWeight = 0;
+            if (targetPurity < averagePurity) {
+                silverWeight = totalWeight * (averagePurity - targetPurity) / ( targetPurity-1000);
+            }
+            
+            const finalWeight = totalWeight + silverWeight;
+            
+            // Cập nhật bảng kết quả
+            let html = '';
+            
+            if (targetPurity > averagePurity) {
+                html = `
+                    <tr>
+                        <td>Tổng trọng lượng gốc</td>
+                        <td>${gemToChiFormat(totalWeight)} (${gemToTael(totalWeight)} Lượng)</td>
+                    </tr>
+                    <tr>
+                        <td>Tuổi gốc (trung bình)</td>
+                        <td>${averagePurity.toFixed(0)}</td>
+                    </tr>
+                    <tr>
+                        <td>Tuổi sau pha chế</td>
+                        <td>${targetPurity}</td>
+                    </tr>
+                    <tr>
+                        <td>Lượng bạc cần thêm vào</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Tổng trọng lượng sau pha chế</td>
+                        <td>-</td>
+                    </tr>
+                `;
+                warningDiv.innerHTML = '<div class="warning">⚠️ Không thể tăng tuổi vàng bằng cách thêm bạc. Tuổi mong muốn phải thấp hơn tuổi gốc.</div>';
+            } else {
+                html = `
+                    <tr>
+                        <td>Tổng trọng lượng gốc</td>
+                        <td>${gemToChiFormat(totalWeight)} (${gemToTael(totalWeight)} tl)</td>
+                    </tr>
+                    <tr>
+                        <td>Tuổi gốc (trung bình)</td>
+                        <td>${averagePurity.toFixed(0)}</td>
+                    </tr>
+                    <tr>
+                        <td>Tuổi sau pha chế</td>
+                        <td>${targetPurity}</td>
+                    </tr>
+                    <tr>
+                        <td>Lượng bạc cần thêm vào</td>
+                        <td><span class="highlight">${gemToChiFormat(Math.round(silverWeight))} (${gemToTael(silverWeight)} tl)</span></td>
+                    </tr>
+                    <tr>
+                        <td>Tổng trọng lượng sau pha chế</td>
+                        <td><span class="highlight">${gemToChiFormat(Math.round(finalWeight))} (${gemToTael(finalWeight)} tl)</span></td>
+                    </tr>
+                `;
+                warningDiv.innerHTML = '';
+            }
+            
+            resultTbody.innerHTML = html;
+        }
+        
+        // Khởi tạo event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event listeners cho row đầu tiên
+            const firstRow = document.querySelector('#goldTableBody tr');
+            const firstWeightInput = firstRow.querySelector('.weight-input');
+            const firstPurityInput = firstRow.querySelector('.purity-input');
+            
+            firstWeightInput.addEventListener('input', function() {
+                updateWeightDescription(this);
+                calculateResults();
+            });
+            
+            firstPurityInput.addEventListener('input', calculateResults);
+            
+            // Event listener cho tuổi mong muốn
+            document.getElementById('targetPurity').addEventListener('input', calculateResults);
+            
+            // Tính toán ban đầu
+            calculateResults();
+        });
+    </script>
+</body>
+</html>

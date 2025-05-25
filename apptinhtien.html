@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng dụng Sổ cái</title>
+    <style>
+        .test-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .test-btn {
+            background-color: #f39c12;
+            font-size: 13px;
+        }
+        
+        .test-btn:hover {
+            background-color: #e67e22;
+        }
+        
+        .test-status {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 50%;
+            margin-left: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .not-tested {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .tested {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .test-btn.tested {
+            background-color: #2ecc71;
+        }
+        
+        .test-btn.tested:hover {
+            background-color: #27ae60;
+        }
+        
+        /* Kiểm tra modal */
+        .test-modal-content {
+            max-width: 500px;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .test-success {
+            background-color: #d5f5e3;
+            border: 1px solid #2ecc71;
+            color: #27ae60;
+        }
+        
+        .test-error {
+            background-color: #f8d7da;
+            border: 1px solid #e74c3c;
+            color: #c0392b;
+        }
+        
+        .test-details {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        
+        .error-row {
+            margin-bottom: 5px;
+            padding: 5px;
+            background-color: #fef9e7;
+            border-left: 3px solid #f39c12;
+        }        
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+        
+        .app-container {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 90vh;
+        }
+        
+        .page-sidebar {
+            width: 100px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .sidebar-btn {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .total-stats-btn {
+            width: 100%;
+            background-color: #e74c3c;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        
+        .total-stats-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .page-number {
+            text-align: center;
+            padding: 8px 5px;
+            margin: 3px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+        
+        .page-number:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .page-number.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .content-container {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .controls {
+            margin-bottom: 15px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .input-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            height: 45px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button.selected {
+            background-color: #16a085;
+        }
+        
+        button.stats-btn {
+            background-color: #9b59b6;
+            margin-left: auto;
+        }
+        
+        button.stats-btn:hover {
+            background-color: #8e44ad;
+        }
+        
+        .highlighted-column {
+            background-color: #e8f6ff;
+        }
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .total-row td {
+            font-weight: bold;
+            background-color: #e8f4fc;
+        }
+        
+        .data-cell {
+            min-width: 100px;
+        }
+        
+        .center-text {
+            text-align: center;
+        }
+        
+        .data-list {
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            animation: modalopen 0.3s;
+        }
+        
+        .modal-content-large {
+            max-width: 800px;
+        }
+        
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .close-btn, .close-total-btn, .close-test-btn {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover, .close-total-btn:hover, .close-test-btn:hover {
+            color: #555;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .stats-item {
+            background-color: #f8f8f8;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .stats-item h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .stats-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .total-item {
+            grid-column: span 2;
+            background-color: #e8f4fc;
+            border-left: 4px solid #16a085;
+        }
+        
+        /* Thống kê tổng */
+        .total-stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .pages-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .page-stats-item {
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            overflow: hidden;
+        }
+        
+        .page-stats-header {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+        }
+        
+        .page-stats-content {
+            padding: 10px;
+        }
+        
+        .page-stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .page-stats-table th,
+        .page-stats-table td {
+            padding: 6px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .page-stats-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .grand-total {
+            background-color: #e8f4fc;
+            border-radius: 6px;
+            border: 1px solid #bbd8e8;
+            padding: 15px;
+        }
+        
+        .grand-total h3 {
+            margin: 0 0 10px 0;
+            color: #16a085;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .total-stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .total-stats-table th,
+        .total-stats-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #bbd8e8;
+        }
+        
+        .total-stats-table th {
+            background-color: #d4e6f1;
+            font-weight: bold;
+        }
+        
+        .highlight-row td {
+            background-color: #d5f5e3;
+            font-weight: bold;
+            color: #16a085;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar hiển thị số trang -->
+        <div class="page-sidebar" id="pageSidebar">
+            <!-- Pages will be dynamically added here -->
+        <div class="sidebar-footer">
+                <button id="exportReportBtn" class="sidebar-btn" style="margin-bottom: 10px; background-color: #2980b9;">Xuất báo cáo</button>
+                <button id="importReportBtn" class="sidebar-btn" style="margin-bottom: 10px; background-color: #9b59b6;">Tải báo cáo</button>
+                <button id="totalStatsBtn" class="total-stats-btn">Thống kê tổng</button>
+            </div>
+        </div>
+        
+        <!-- Phần nội dung chính -->
+        <div class="content-container">
+            <h1 class="center-text">Ứng dụng Sổ cái</h1>
+            
+            <!-- Các điều khiển -->
+            <div class="controls">
+                <div class="button-group">
+                    <button id="newPageBtn">Tạo trang mới</button>
+                    <button id="col1Btn" class="selected">Chọn TIỀN CÔNG 1</button>
+                    <button id="col2Btn">Chọn TIỀN CÔNG 2</button>
+                    <button id="col3Btn">Chọn TRỌNG LƯỢNG 610</button>
+                    <button id="col4Btn">Chọn TRỌNG LƯỢNG 710</button>
+                    <button id="statsBtn" class="stats-btn">Thống kê trang</button>
+                </div>
+                <div class="input-group">
+                    <label for="sumInput">Nhập số (cách nhau bằng khoảng trắng):</label>
+                    <input type="text" id="sumInput" placeholder="Ví dụ: 100 200 300">
+                </div>
+                <div class="test-buttons">
+                    <button id="testCol1Btn" class="test-btn">Kiểm tra TIỀN CÔNG 1</button>
+                    <button id="testCol2Btn" class="test-btn">Kiểm tra TIỀN CÔNG 2</button>
+                    <button id="testCol3Btn" class="test-btn">Kiểm tra TRỌNG LƯỢNG 610</button>
+                    <button id="testCol4Btn" class="test-btn">Kiểm tra TRỌNG LƯỢNG 710</button>
+                </div>
+            </div>
+            
+            <!-- Bảng hiển thị dữ liệu -->
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th id="headerCol1">TIỀN CÔNG 1</th>
+                            <th id="headerCol2">TIỀN CÔNG 2</th>
+                            <th id="headerCol3">TRỌNG LƯỢNG 610</th>
+                            <th id="headerCol4">TRỌNG LƯỢNG 710</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data rows will be dynamically added here -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td>Tổng cộng</td>
+                            <td id="totalCol1">0</td>
+                            <td id="totalCol2">0</td>
+                            <td id="totalCol3">0</td>
+                            <td id="totalCol4">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Thống kê trang hiện tại -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Thống kê Trang <span id="currentPageStats">1</span></h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="stats-container">
+                <div class="stats-item">
+                    <h3>Giá trị Công 1</h3>
+                    <div id="statCol1" class="stats-value">0</div>
+                </div>
+                <div class="stats-item">
+                    <h3>Giá trị Công 2</h3>
+                    <div id="statCol2" class="stats-value">0</div>
+                </div>
+                <div class="stats-item">
+                    <h3>Tổng Trọng lượng 610</h3>
+                    <div id="statCol3" class="stats-value">0</div>
+                </div>
+                <div class="stats-item">
+                    <h3>Tổng Trọng lượng 710</h3>
+                    <div id="statCol4" class="stats-value">0</div>
+                </div>
+                <div class="stats-item total-item">
+                    <h3>Tổng Công 1 + Công 2</h3>
+                    <div id="statTotal" class="stats-value">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Thống kê tổng tất cả trang -->
+    <div id="totalStatsModal" class="modal">
+        <div class="modal-content modal-content-large">
+            <div class="modal-header">
+                <h2>Thống kê tổng tất cả trang</h2>
+                <span class="close-total-btn">&times;</span>
+            </div>
+            <div class="total-stats-container">
+                <div class="pages-stats" id="pagesStats">
+                    <!-- Thống kê chi tiết cho từng trang sẽ được thêm ở đây -->
+                </div>
+                <div class="input-section" style="margin: 20px 0; background-color: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                    <h3 style="margin-bottom: 10px; color: #333;">Giá trị cũ</h3>
+                    <div style="display: flex; gap: 20px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label for="old610Input">TRỌNG LƯỢNG 610 CŨ:</label>
+                            <input type="text" id="old610Input" placeholder="Nhập giá trị cũ 610" style="width: 100%;">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label for="old710Input">TRỌNG LƯỢNG 710 CŨ:</label>
+                            <input type="text" id="old710Input" placeholder="Nhập giá trị cũ 710" style="width: 100%;">
+                        </div>
+                        <button id="calculateBtn" style="align-self: flex-end; background-color: #16a085;">Tính toán</button>
+                    </div>
+                </div>
+                <div class="grand-total">
+                    <h3>Tổng hợp tất cả trang</h3>
+                    <table class="total-stats-table">
+                        <thead>
+                            <tr>
+                                <th>Tiêu chí</th>
+                                <th>Giá trị</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tổng TIỀN CÔNG 1</td>
+                                <td id="grandTotalCol1">0</td>
+                            </tr>
+                            <tr>
+                                <td>Tổng TIỀN CÔNG 2</td>
+                                <td id="grandTotalCol2">0</td>
+                            </tr>
+                            <tr>
+                                <td>Tổng TRỌNG LƯỢNG 610 (Gốc)</td>
+                                <td id="grandTotalCol3">0</td>
+                            </tr>
+                            <tr>
+                                <td>Tổng TRỌNG LƯỢNG 710 (Gốc)</td>
+                                <td id="grandTotalCol4">0</td>
+                            </tr>
+                            <tr>
+                                <td>TRỌNG LƯỢNG 610 CŨ</td>
+                                <td id="old610Value">0</td>
+                            </tr>
+                            <tr>
+                                <td>TRỌNG LƯỢNG 710 CŨ</td>
+                                <td id="old710Value">0</td>
+                            </tr>
+                            <tr style="background-color: #d5f5e3;">
+                                <td>TRỌNG LƯỢNG 610 (Mới = Gốc - Cũ)</td>
+                                <td id="new610Value">0</td>
+                            </tr>
+                            <tr style="background-color: #d5f5e3;">
+                                <td>TRỌNG LƯỢNG 710 (Mới = Gốc - Cũ)</td>
+                                <td id="new710Value">0</td>
+                            </tr>
+                            <tr class="highlight-row">
+                                <td>Tổng TIỀN CÔNG (1+2)</td>
+                                <td id="grandTotalCombined">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Kiểm tra cột -->
+    <div id="testModal" class="modal">
+        <div class="modal-content test-modal-content">
+            <div class="modal-header">
+                <h2>Kiểm tra <span id="testColumnName">TIỀN CÔNG 1</span></h2>
+                <span class="close-test-btn">&times;</span>
+            </div>
+            <div class="test-container">
+                <div class="input-group">
+                    <label for="testInput">Nhập các giá trị cần kiểm tra (cách nhau bởi khoảng trắng):</label>
+                    <input type="text" id="testInput" placeholder="Ví dụ: 100 200 300">
+                </div>
+                <button id="runTestBtn" class="test-btn">Kiểm tra</button>
+                
+                <div id="testResult" class="test-result">
+                    <div id="testMessage"></div>
+                    <div id="testDetails" class="test-details"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tải báo cáo -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tải báo cáo từ file</h2>
+                <span class="close-import-btn">&times;</span>
+            </div>
+            <div class="import-container">
+                <p style="margin-bottom: 15px;">Chọn file JSON báo cáo để tải lên:</p>
+                <input type="file" id="importFileInput" accept=".json" style="margin-bottom: 15px;">
+                <button id="loadFileBtn" style="background-color: #9b59b6;">Tải file</button>
+                
+                <div id="importResult" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;">
+                    <div id="importMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lưu trữ dữ liệu
+        let ledgerData = {
+            pages: [],
+            currentPage: 0,
+            currentColumn: 1 // 1 = TIỀN CÔNG 1, 2 = TIỀN CÔNG 2, 3 = TRỌNG LƯỢNG 610, 4 = TRỌNG LƯỢNG 710
+        };
+        
+        // Định dạng số với dấu phân cách hàng nghìn
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        
+        // Biến global cho kiểm tra
+        let currentTestColumn = 0; // 0-3 tương ứng với các cột
+        
+        // Hiển thị modal kiểm tra
+        function showTestModal(columnIndex) {
+            currentTestColumn = columnIndex;
+            
+            // Đặt tiêu đề cho modal
+            const columnNames = ['TIỀN CÔNG 1', 'TIỀN CÔNG 2', 'TRỌNG LƯỢNG 610', 'TRỌNG LƯỢNG 710'];
+            testColumnName.textContent = columnNames[columnIndex];
+            
+            // Reset form
+            testInput.value = '';
+            testResult.style.display = 'none';
+            
+            // Hiển thị modal
+            testModal.style.display = 'block';
+            testInput.focus();
+        }
+        
+        // Chạy kiểm tra
+        function runTest() {
+            // Lấy giá trị nhập vào
+            const testValues = testInput.value.trim().split(/\s+/).filter(Boolean).map(Number);
+            
+            // Lấy giá trị cột hiện tại
+            const currentPage = ledgerData.pages[ledgerData.currentPage];
+            const columnData = currentPage.columns[currentTestColumn];
+            
+            // Kiểm tra số lượng
+            if (testValues.length !== columnData.length) {
+                showTestError(`Số lượng giá trị không khớp. Nhập vào: ${testValues.length}, Cột dữ liệu: ${columnData.length}`);
+                currentPage.tested[currentTestColumn] = false;
+                updateTestButtonsStatus();
+                return;
+            }
+            
+            // Kiểm tra từng giá trị
+            let allMatch = true;
+            let errors = [];
+            
+            for (let i = 0; i < columnData.length; i++) {
+                if (testValues[i] !== columnData[i]) {
+                    allMatch = false;
+                    errors.push({
+                        row: i + 1,
+                        expected: columnData[i],
+                        actual: testValues[i]
+                    });
+                }
+            }
+            
+            // Hiển thị kết quả và cập nhật trạng thái test
+            if (allMatch) {
+                showTestSuccess('Tất cả giá trị đều khớp với dữ liệu trong cột!');
+                currentPage.tested[currentTestColumn] = true;
+            } else {
+                let errorMsg = `Có ${errors.length} giá trị không khớp:`;
+                showTestError(errorMsg, errors);
+                currentPage.tested[currentTestColumn] = false;
+            }
+            
+            // Cập nhật hiển thị trạng thái test
+            updateTestButtonsStatus();
+            updatePageSidebar();
+        }
+        
+        // Hiển thị lỗi kiểm tra
+        function showTestError(message, errors = []) {
+            testResult.className = 'test-result test-error';
+            testMessage.textContent = message;
+            
+            // Xóa chi tiết cũ
+            testDetails.innerHTML = '';
+            
+            // Thêm chi tiết lỗi nếu có
+            if (errors.length > 0) {
+                errors.forEach(error => {
+                    const errorRow = document.createElement('div');
+                    errorRow.className = 'error-row';
+                    errorRow.textContent = `Dòng ${error.row}: Giá trị nhập vào ${error.actual}, Giá trị cần khớp ${error.expected}`;
+                    testDetails.appendChild(errorRow);
+                });
+            }
+            
+            // Hiển thị kết quả
+            testResult.style.display = 'block';
+        }
+        
+        // Hiển thị thành công kiểm tra
+        function showTestSuccess(message) {
+            testResult.className = 'test-result test-success';
+            testMessage.textContent = message;
+            testDetails.innerHTML = '';
+            testResult.style.display = 'block';
+        }
+        
+        // Hiển thị modal thống kê trang hiện tại
+        function showStatsModal() {
+            // Lấy trang hiện tại
+            let currentPage = ledgerData.pages[ledgerData.currentPage];
+            
+            // Cập nhật tiêu đề với số trang
+            currentPageStats.textContent = currentPage.id;
+            
+            // Cập nhật giá trị hiển thị trong modal
+            statCol1.textContent = formatNumber(currentPage.totals[0]);
+            statCol2.textContent = formatNumber(currentPage.totals[1]);
+            statCol3.textContent = formatNumber(currentPage.totals[2]);
+            statCol4.textContent = formatNumber(currentPage.totals[3]);
+            statTotal.textContent = formatNumber(currentPage.totals[0] + currentPage.totals[1]);
+            
+            // Hiển thị modal
+            statsModal.style.display = 'block';
+        }
+        
+        // Hiển thị modal thống kê tổng tất cả trang
+        function showTotalStatsModal() {
+            // Xóa nội dung cũ
+            pagesStats.innerHTML = '';
+            
+            // Biến để lưu tổng hợp
+            let grandTotals = [0, 0, 0, 0];
+            
+            // Thêm thống kê cho từng trang
+            ledgerData.pages.forEach((page, index) => {
+                // Tạo phần tử thống kê cho trang
+                const pageStatsItem = document.createElement('div');
+                pageStatsItem.className = 'page-stats-item';
+                
+                // Tạo header
+                const pageStatsHeader = document.createElement('div');
+                pageStatsHeader.className = 'page-stats-header';
+                pageStatsHeader.textContent = `Trang ${page.id}`;
+                
+                // Tạo nội dung
+                const pageStatsContent = document.createElement('div');
+                pageStatsContent.className = 'page-stats-content';
+                
+                // Tạo bảng thống kê
+                const pageStatsTable = document.createElement('table');
+                pageStatsTable.className = 'page-stats-table';
+                
+                // Tạo header cho bảng
+                const tableHeader = document.createElement('tr');
+                tableHeader.innerHTML = `
+                    <th>Tiêu chí</th>
+                    <th>Giá trị</th>
+                `;
+                
+                // Tạo body cho bảng
+                const tableBody = document.createElement('tbody');
+                
+                // Thêm dữ liệu
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>TIỀN CÔNG 1</td>
+                        <td>${formatNumber(page.totals[0])}</td>
+                    </tr>
+                    <tr>
+                        <td>TIỀN CÔNG 2</td>
+                        <td>${formatNumber(page.totals[1])}</td>
+                    </tr>
+                    <tr>
+                        <td>TRỌNG LƯỢNG 610</td>
+                        <td>${formatNumber(page.totals[2])}</td>
+                    </tr>
+                    <tr>
+                        <td>TRỌNG LƯỢNG 710</td>
+                        <td>${formatNumber(page.totals[3])}</td>
+                    </tr>
+                    <tr style="font-weight: bold; background-color: #e8f4fc;">
+                        <td>Tổng TIỀN CÔNG (1+2)</td>
+                        <td>${formatNumber(page.totals[0] + page.totals[1])}</td>
+                    </tr>
+                `;
+                
+                // Cộng vào tổng hợp
+                for (let i = 0; i < 4; i++) {
+                    grandTotals[i] += page.totals[i];
+                }
+                
+                // Ghép các phần lại với nhau
+                pageStatsTable.appendChild(tableHeader);
+                pageStatsTable.appendChild(tableBody);
+                pageStatsContent.appendChild(pageStatsTable);
+                pageStatsItem.appendChild(pageStatsHeader);
+                pageStatsItem.appendChild(pageStatsContent);
+                
+                // Thêm vào container
+                pagesStats.appendChild(pageStatsItem);
+            });
+            
+            // Reset các giá trị cũ nếu đã nhập
+            old610Input.value = '';
+            old710Input.value = '';
+            
+            // Cập nhật tổng hợp
+            grandTotalCol1.textContent = formatNumber(grandTotals[0]);
+            grandTotalCol2.textContent = formatNumber(grandTotals[1]);
+            grandTotalCol3.textContent = formatNumber(grandTotals[2]);
+            grandTotalCol4.textContent = formatNumber(grandTotals[3]);
+            grandTotalCombined.textContent = formatNumber(grandTotals[0] + grandTotals[1]);
+            
+            // Reset các giá trị cũ và mới
+            old610Value.textContent = '0';
+            old710Value.textContent = '0';
+            new610Value.textContent = formatNumber(grandTotals[2]);
+            new710Value.textContent = formatNumber(grandTotals[3]);
+            
+            // Hiển thị modal
+            totalStatsModal.style.display = 'block';
+        }
+        
+        // Hàm tính toán giá trị mới khi người dùng nhập giá trị cũ
+        function calculateNewValues() {
+            // Lấy tổng gốc
+            let total610 = parseFloat(grandTotalCol3.textContent.replace(/\./g, '')) || 0;
+            let total710 = parseFloat(grandTotalCol4.textContent.replace(/\./g, '')) || 0;
+            
+            // Lấy giá trị cũ từ input
+            let old610 = parseFloat(old610Input.value.trim()) || 0;
+            let old710 = parseFloat(old710Input.value.trim()) || 0;
+            
+            // Cập nhật hiển thị giá trị cũ
+            old610Value.textContent = formatNumber(old610);
+            old710Value.textContent = formatNumber(old710);
+            
+            // Tính toán giá trị mới
+            let new610 = total610 - old610;
+            let new710 = total710 - old710;
+            
+            // Hiển thị giá trị mới
+            new610Value.textContent = formatNumber(new610);
+            new710Value.textContent = formatNumber(new710);
+        }
+        
+        // Hàm xuất báo cáo dưới dạng JSON
+        function exportReport() {
+            // Tạo đối tượng dữ liệu để xuất
+            const reportData = {
+                reportDate: new Date().toISOString(),
+                pages: ledgerData.pages
+            };
+            
+            // Chuyển đối tượng thành chuỗi JSON
+            const jsonData = JSON.stringify(reportData, null, 2);
+            
+            // Tạo tên file với định dạng ngày hiện tại
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            
+            const fileName = `report_${day}${month}${year}.json`;
+            
+            // Tạo đối tượng Blob
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            
+            // Tạo URL cho blob
+            const url = URL.createObjectURL(blob);
+            
+            // Tạo thẻ a để tải file
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            
+            // Thêm vào body, click và xóa
+            document.body.appendChild(a);
+            a.click();
+            
+            // Dọn dẹp
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+        }
+        
+        // Hàm tải báo cáo từ file JSON
+        function showImportModal() {
+            // Reset thông báo
+            importResult.style.display = 'none';
+            importFileInput.value = '';
+            
+            // Hiển thị modal
+            importModal.style.display = 'block';
+        }
+        
+        // Hàm xử lý tải file
+        function importReport() {
+            // Kiểm tra xem đã chọn file chưa
+            if (!importFileInput.files || importFileInput.files.length === 0) {
+                showImportError('Vui lòng chọn file JSON để tải lên.');
+                return;
+            }
+            
+            const file = importFileInput.files[0];
+            
+            // Kiểm tra định dạng file
+            if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+                showImportError('Vui lòng chọn file JSON hợp lệ.');
+                return;
+            }
+            
+            // Đọc file
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    // Parse dữ liệu JSON
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Kiểm tra cấu trúc dữ liệu
+                    if (!importedData.pages || !Array.isArray(importedData.pages)) {
+                        showImportError('File JSON không đúng định dạng hoặc không chứa dữ liệu trang.');
+                        return;
+                    }
+                    
+                    // Đảm bảo mỗi trang có thuộc tính 'tested'
+                    importedData.pages.forEach(page => {
+                        if (!page.tested || !Array.isArray(page.tested) || page.tested.length !== 4) {
+                            page.tested = [false, false, false, false];
+                        }
+                    });
+                    
+                    // Cập nhật dữ liệu
+                    ledgerData.pages = importedData.pages;
+                    ledgerData.currentPage = 0;
+                    
+                    // Cập nhật giao diện
+                    updatePageSidebar();
+                    renderCurrentPage();
+                    
+                    // Hiển thị thông báo thành công
+                    showImportSuccess(`Đã tải thành công ${importedData.pages.length} trang dữ liệu từ file ${file.name}`);
+                } catch (error) {
+                    showImportError('Lỗi khi đọc file JSON: ' + error.message);
+                }
+            };
+            
+            reader.onerror = function() {
+                showImportError('Lỗi khi đọc file.');
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Hiển thị lỗi khi tải file
+        function showImportError(message) {
+            importResult.className = 'test-result test-error';
+            importMessage.textContent = message;
+            importResult.style.display = 'block';
+        }
+        
+        // Hiển thị thành công khi tải file
+        function showImportSuccess(message) {
+            importResult.className = 'test-result test-success';
+            importMessage.textContent = message;
+            importResult.style.display = 'block';
+        }
+
+        // Các phần tử DOM
+        const pageSidebar = document.getElementById('pageSidebar');
+        const tableBody = document.getElementById('tableBody');
+        const newPageBtn = document.getElementById('newPageBtn');
+        const col1Btn = document.getElementById('col1Btn');
+        const col2Btn = document.getElementById('col2Btn');
+        const col3Btn = document.getElementById('col3Btn');
+        const col4Btn = document.getElementById('col4Btn');
+        const statsBtn = document.getElementById('statsBtn');
+        const totalStatsBtn = document.getElementById('totalStatsBtn');
+        const exportReportBtn = document.getElementById('exportReportBtn');
+        const importReportBtn = document.getElementById('importReportBtn');
+        const sumInput = document.getElementById('sumInput');
+        const totalCol1 = document.getElementById('totalCol1');
+        const totalCol2 = document.getElementById('totalCol2');
+        const totalCol3 = document.getElementById('totalCol3');
+        const totalCol4 = document.getElementById('totalCol4');
+        
+        // Test buttons
+        const testCol1Btn = document.getElementById('testCol1Btn');
+        const testCol2Btn = document.getElementById('testCol2Btn');
+        const testCol3Btn = document.getElementById('testCol3Btn');
+        const testCol4Btn = document.getElementById('testCol4Btn');
+        
+        // Modal elements - Thống kê trang
+        const statsModal = document.getElementById('statsModal');
+        const closeBtn = document.querySelector('.close-btn');
+        const currentPageStats = document.getElementById('currentPageStats');
+        const statCol1 = document.getElementById('statCol1');
+        const statCol2 = document.getElementById('statCol2');
+        const statCol3 = document.getElementById('statCol3');
+        const statCol4 = document.getElementById('statCol4');
+        const statTotal = document.getElementById('statTotal');
+        
+        // Modal elements - Thống kê tổng
+        const totalStatsModal = document.getElementById('totalStatsModal');
+        const closeTotalBtn = document.querySelector('.close-total-btn');
+        const pagesStats = document.getElementById('pagesStats');
+        const grandTotalCol1 = document.getElementById('grandTotalCol1');
+        const grandTotalCol2 = document.getElementById('grandTotalCol2');
+        const grandTotalCol3 = document.getElementById('grandTotalCol3');
+        const grandTotalCol4 = document.getElementById('grandTotalCol4');
+        const grandTotalCombined = document.getElementById('grandTotalCombined');
+        
+        // Các phần tử mới cho trọng lượng cũ
+        const old610Input = document.getElementById('old610Input');
+        const old710Input = document.getElementById('old710Input');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const old610Value = document.getElementById('old610Value');
+        const old710Value = document.getElementById('old710Value');
+        const new610Value = document.getElementById('new610Value');
+        const new710Value = document.getElementById('new710Value');
+        
+        // Modal elements - Kiểm tra
+        const testModal = document.getElementById('testModal');
+        const closeTestBtn = document.querySelector('.close-test-btn');
+        const testColumnName = document.getElementById('testColumnName');
+        const testInput = document.getElementById('testInput');
+        const runTestBtn = document.getElementById('runTestBtn');
+        const testResult = document.getElementById('testResult');
+        const testMessage = document.getElementById('testMessage');
+        const testDetails = document.getElementById('testDetails');
+        
+        // Modal elements - Import
+        const importModal = document.getElementById('importModal');
+        const closeImportBtn = document.querySelector('.close-import-btn');
+        const importFileInput = document.getElementById('importFileInput');
+        const loadFileBtn = document.getElementById('loadFileBtn');
+        const importResult = document.getElementById('importResult');
+        const importMessage = document.getElementById('importMessage');
+
+        // Khởi tạo ứng dụng
+        function initApp() {
+            // Tạo trang đầu tiên
+            createNewPage();
+            
+            // Thêm event listeners
+            newPageBtn.addEventListener('click', createNewPage);
+            col1Btn.addEventListener('click', () => setCurrentColumn(1));
+            col2Btn.addEventListener('click', () => setCurrentColumn(2));
+            col3Btn.addEventListener('click', () => setCurrentColumn(3));
+            col4Btn.addEventListener('click', () => setCurrentColumn(4));
+            sumInput.addEventListener('input', handleSumInput);
+            
+            // Event listeners cho modal thống kê trang
+            statsBtn.addEventListener('click', showStatsModal);
+            closeBtn.addEventListener('click', () => statsModal.style.display = 'none');
+            
+            // Event listeners cho modal thống kê tổng
+            totalStatsBtn.addEventListener('click', showTotalStatsModal);
+            closeTotalBtn.addEventListener('click', () => totalStatsModal.style.display = 'none');
+            calculateBtn.addEventListener('click', calculateNewValues);
+            
+            // Thêm event listeners cho input trọng lượng cũ
+            old610Input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Chỉ cho phép nhập số
+            });
+            
+            old710Input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Chỉ cho phép nhập số
+            });
+            
+            // Event listeners cho test buttons
+            testCol1Btn.addEventListener('click', () => showTestModal(0));
+            testCol2Btn.addEventListener('click', () => showTestModal(1));
+            testCol3Btn.addEventListener('click', () => showTestModal(2));
+            testCol4Btn.addEventListener('click', () => showTestModal(3));
+            
+            // Event listeners cho test modal
+            closeTestBtn.addEventListener('click', () => testModal.style.display = 'none');
+            runTestBtn.addEventListener('click', runTest);
+            
+            // Event listeners cho xuất/nhập báo cáo
+            exportReportBtn.addEventListener('click', exportReport);
+            importReportBtn.addEventListener('click', showImportModal);
+            closeImportBtn.addEventListener('click', () => importModal.style.display = 'none');
+            loadFileBtn.addEventListener('click', importReport);
+            
+            // Đóng modal khi click ra ngoài
+            window.addEventListener('click', (e) => {
+                if (e.target == statsModal) {
+                    statsModal.style.display = 'none';
+                }
+                if (e.target == totalStatsModal) {
+                    totalStatsModal.style.display = 'none';
+                }
+                if (e.target == testModal) {
+                    testModal.style.display = 'none';
+                }
+                if (e.target == importModal) {
+                    importModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Tạo trang mới
+        function createNewPage() {
+            const newPage = {
+                id: ledgerData.pages.length + 1,
+                columns: [
+                    [], // TIỀN CÔNG 1
+                    [], // TIỀN CÔNG 2
+                    [], // TRỌNG LƯỢNG 610
+                    []  // TRỌNG LƯỢNG 710
+                ],
+                totals: [0, 0, 0, 0], // Totals for 4 columns
+                tested: [false, false, false, false] // Trạng thái test cho 4 cột
+            };
+            
+            ledgerData.pages.push(newPage);
+            ledgerData.currentPage = newPage.id - 1;
+            
+            updatePageSidebar();
+            renderCurrentPage();
+        }
+
+        // Cập nhật sidebar hiển thị số trang
+        function updatePageSidebar() {
+            // Xóa nội dung cũ nhưng giữ lại phần footer
+            const children = Array.from(pageSidebar.children);
+            for (let child of children) {
+                if (!child.classList.contains('sidebar-footer')) {
+                    pageSidebar.removeChild(child);
+                }
+            }
+            
+            // Thêm các trang
+            ledgerData.pages.forEach((page, index) => {
+                const pageElement = document.createElement('div');
+                pageElement.className = 'page-number' + (index === ledgerData.currentPage ? ' active' : '');
+                
+                // Kiểm tra xem trang đã được test đầy đủ chưa
+                const allTested = page.tested.every(status => status === true);
+                
+                // Thêm chỉ báo trạng thái test
+                if (!allTested) {
+                    pageElement.innerHTML = `Trang ${page.id} <span class="test-status not-tested">!</span>`;
+                } else {
+                    pageElement.innerHTML = `Trang ${page.id} <span class="test-status tested">✓</span>`;
+                }
+                
+                pageElement.addEventListener('click', () => {
+                    ledgerData.currentPage = index;
+                    updatePageSidebar();
+                    renderCurrentPage();
+                });
+                
+                // Thêm vào đầu sidebar, trước phần footer
+                const footer = pageSidebar.querySelector('.sidebar-footer');
+                pageSidebar.insertBefore(pageElement, footer);
+            });
+        }
+
+        // Đặt cột hiện tại để nhập dữ liệu
+        function setCurrentColumn(column) {
+            ledgerData.currentColumn = column;
+            
+            // Cập nhật trạng thái các nút
+            col1Btn.className = column === 1 ? 'selected' : '';
+            col2Btn.className = column === 2 ? 'selected' : '';
+            col3Btn.className = column === 3 ? 'selected' : '';
+            col4Btn.className = column === 4 ? 'selected' : '';
+            
+            // Xóa dữ liệu trong input và hiển thị dữ liệu của cột đang chọn
+            const currentPage = ledgerData.pages[ledgerData.currentPage];
+            const currentColumnData = currentPage.columns[column - 1];
+            
+            // Hiển thị dữ liệu hiện tại của cột trong input để người dùng có thể tiếp tục nhập
+            sumInput.value = currentColumnData.join(' ');
+            sumInput.focus();
+            
+            // Render lại trang để highlight cột đang chọn
+            renderCurrentPage();
+        }
+
+        // Xử lý input tổng
+        function handleSumInput(event) {
+            // Lấy chuỗi đầu vào và loại bỏ các ký tự không phải số và khoảng trắng
+            let value = event.target.value.replace(/[^0-9\s]/g, '');
+            
+            // Cập nhật lại giá trị của input
+            sumInput.value = value;
+            
+            // Chuyển đổi chuỗi thành mảng các số
+            let numbers = value.trim().split(/\s+/).filter(Boolean).map(Number);
+            
+            // Lấy trang hiện tại
+            let currentPage = ledgerData.pages[ledgerData.currentPage];
+            
+            // Cập nhật mảng của cột hiện tại
+            let columnIndex = ledgerData.currentColumn - 1;
+            currentPage.columns[columnIndex] = numbers;
+            
+            // Tính tổng cho cột hiện tại
+            currentPage.totals[columnIndex] = numbers.reduce((sum, num) => sum + num, 0);
+            
+            // Render lại trang hiện tại
+            renderCurrentPage();
+        }
+
+        // Cập nhật trạng thái các nút kiểm tra
+        function updateTestButtonsStatus() {
+            const currentPage = ledgerData.pages[ledgerData.currentPage];
+            
+            // Cập nhật các nút test
+            testCol1Btn.className = 'test-btn' + (currentPage.tested[0] ? ' tested' : '');
+            testCol2Btn.className = 'test-btn' + (currentPage.tested[1] ? ' tested' : '');
+            testCol3Btn.className = 'test-btn' + (currentPage.tested[2] ? ' tested' : '');
+            testCol4Btn.className = 'test-btn' + (currentPage.tested[3] ? ' tested' : '');
+        }
+        
+        // Hiển thị nội dung trang hiện tại
+        function renderCurrentPage() {
+            // Lấy trang hiện tại
+            let currentPage = ledgerData.pages[ledgerData.currentPage];
+            
+            // Xóa nội dung bảng
+            tableBody.innerHTML = '';
+            
+            // Highlight header của cột đang chọn
+            const headerCol1 = document.getElementById('headerCol1');
+            const headerCol2 = document.getElementById('headerCol2');
+            const headerCol3 = document.getElementById('headerCol3');
+            const headerCol4 = document.getElementById('headerCol4');
+            
+            headerCol1.classList.remove('highlighted-column');
+            headerCol2.classList.remove('highlighted-column');
+            headerCol3.classList.remove('highlighted-column');
+            headerCol4.classList.remove('highlighted-column');
+            
+            // Highlight header của cột đang chọn
+            document.getElementById('headerCol' + ledgerData.currentColumn).classList.add('highlighted-column');
+            
+            // Tìm số hàng tối đa cần hiển thị
+            let maxRows = 0;
+            currentPage.columns.forEach(column => {
+                maxRows = Math.max(maxRows, column.length);
+            });
+            
+            // Nếu không có dữ liệu, hiển thị một hàng trống
+            if (maxRows === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="5" class="center-text">Chưa có dữ liệu</td>';
+                tableBody.appendChild(row);
+            } else {
+                // Hiển thị mỗi dòng
+                for (let i = 0; i < maxRows; i++) {
+                    const row = document.createElement('tr');
+                    
+                    // STT
+                    const sttCell = document.createElement('td');
+                    sttCell.textContent = i + 1;
+                    row.appendChild(sttCell);
+                    
+                    // Tạo các ô dữ liệu cho 4 cột
+                    for (let j = 0; j < 4; j++) {
+                        const cell = document.createElement('td');
+                        cell.className = 'data-cell';
+                        
+                        // Highlight cột đang được chọn
+                        if (j === ledgerData.currentColumn - 1) {
+                            cell.classList.add('highlighted-column');
+                        }
+                        
+                        // Hiển thị giá trị nếu có
+                        if (i < currentPage.columns[j].length) {
+                            cell.textContent = currentPage.columns[j][i];
+                        }
+                        
+                        row.appendChild(cell);
+                    }
+                    
+                    tableBody.appendChild(row);
+                }
+            }
+            
+            // Cập nhật tổng cộng của trang hiện tại
+            totalCol1.textContent = formatNumber(currentPage.totals[0]);
+            totalCol2.textContent = formatNumber(currentPage.totals[1]);
+            totalCol3.textContent = formatNumber(currentPage.totals[2]);
+            totalCol4.textContent = formatNumber(currentPage.totals[3]);
+            
+            // Cập nhật trạng thái nút test
+            updateTestButtonsStatus();
+        }
+
+        // Khởi chạy ứng dụng
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

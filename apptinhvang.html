@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng dụng Tính Toán Pha Chế Vàng</title>
+    <style>
+        :root {
+            --primary-color: #FFD700;
+            --secondary-color: #B8860B;
+            --dark-color: #704214;
+            --light-color: #FFF8E1;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--dark-color);
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-color);
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .result h2 {
+            color: var(--dark-color);
+            margin-top: 0;
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .gold-unit {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .flex-row .form-group {
+            width: 48%;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .profit {
+            color: green;
+        }
+        
+        .loss {
+            color: red;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        table th, table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            text-align: left;
+        }
+        
+        @media (max-width: 600px) {
+            .flex-row .form-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tính Toán Pha Chế Vàng</h1>
+        
+        <div class="flex-row">
+            <div class="form-group">
+                <label for="originalWeight">Trọng lượng gốc (đơn vị: phần):</label>
+                <input type="number" id="originalWeight" placeholder="Ví dụ: 10000">
+            </div>
+            <div class="form-group">
+                <label for="originalPurity">Tuổi vàng gốc:</label>
+                <input type="number" id="originalPurity" placeholder="Ví dụ: 610">
+            </div>
+        </div>
+        
+        <div class="flex-row">
+            <div class="form-group">
+                <label for="newPurity">Tuổi vàng sau pha chế:</label>
+                <input type="number" id="newPurity" placeholder="Ví dụ: 9950">
+            </div>
+            <div class="form-group">
+                <label for="originalPrice">Giá vàng gốc (VNĐ/phần):</label>
+                <input type="number" id="originalPrice" placeholder="Ví dụ: 6500">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="newPrice">Giá vàng sau pha chế (VNĐ/phần):</label>
+            <input type="number" id="newPrice" placeholder="Ví dụ: 7000">
+        </div>
+        
+        <button id="calculate">Tính Toán</button>
+        
+        <div id="resultSection" class="result hidden">
+            <h2>Kết Quả Tính Toán</h2>
+            <table>
+                <tr>
+                    <th>Mô tả</th>
+                    <th>Giá trị số</th>
+                    <th>Định dạng đơn vị</th>
+                </tr>
+                <tr>
+                    <td>Trọng lượng gốc</td>
+                    <td id="origWeightResult"></td>
+                    <td id="origWeightFormatted" class="gold-unit"></td>
+                </tr>
+                <tr>
+                    <td>Trọng lượng sau pha chế</td>
+                    <td id="newWeightResult"></td>
+                    <td id="newWeightFormatted" class="gold-unit"></td>
+                </tr>
+                <tr>
+                    <td>Tiền gốc</td>
+                    <td id="origMoneyResult" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td>Tiền sau pha chế</td>
+                    <td id="newMoneyResult" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td>Chênh lệch tiền</td>
+                    <td id="moneyDiffResult" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td>Chênh lệch phần trăm</td>
+                    <td id="percentDiffResult" colspan="2"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculate').addEventListener('click', function() {
+            // Lấy giá trị từ các input
+            const originalWeight = parseFloat(document.getElementById('originalWeight').value);
+            const originalPurity = parseFloat(document.getElementById('originalPurity').value);
+            const newPurity = parseFloat(document.getElementById('newPurity').value);
+            const originalPrice = parseFloat(document.getElementById('originalPrice').value);
+            const newPrice = parseFloat(document.getElementById('newPrice').value);
+            
+            // Kiểm tra nếu tất cả input đều hợp lệ
+            if (isNaN(originalWeight) || isNaN(originalPurity) || isNaN(newPurity) || 
+                isNaN(originalPrice) || isNaN(newPrice)) {
+                alert('Vui lòng nhập đầy đủ thông tin và đảfm bảo tất cả là số!');
+                return;
+            }
+            
+            // Tính toán trọng lượng sau pha chế
+            const newWeight = (originalWeight * originalPurity) / newPurity*10;
+            
+            // Tính toán tiền
+            const originalMoney = originalWeight * originalPrice;
+            const newMoney = newWeight * newPrice;
+            
+            // Tính chênh lệch
+            const moneyDiff = newMoney - originalMoney;
+            const percentDiff = (moneyDiff / originalMoney) * 100;
+            
+            // Hiển thị kết quả
+            document.getElementById('origWeightResult').textContent = originalWeight.toFixed(2);
+            document.getElementById('newWeightResult').textContent = newWeight.toFixed(2);
+            
+            document.getElementById('origMoneyResult').textContent = formatMoney(originalMoney);
+            document.getElementById('newMoneyResult').textContent = formatMoney(newMoney);
+            
+            // Hiển thị chênh lệch với màu sắc tương ứng
+            const moneyDiffElement = document.getElementById('moneyDiffResult');
+            moneyDiffElement.textContent = formatMoney(moneyDiff);
+            moneyDiffElement.className = moneyDiff >= 0 ? 'profit' : 'loss';
+            
+            const percentDiffElement = document.getElementById('percentDiffResult');
+            percentDiffElement.textContent = `${percentDiff.toFixed(2)}%`;
+            percentDiffElement.className = percentDiff >= 0 ? 'profit' : 'loss';
+            
+            // Format trọng lượng theo đơn vị vàng Việt Nam
+            document.getElementById('origWeightFormatted').textContent = formatGoldWeight(originalWeight);
+            document.getElementById('newWeightFormatted').textContent = formatGoldWeight(newWeight);
+            
+            // Hiển thị phần kết quả
+            document.getElementById('resultSection').classList.remove('hidden');
+        });
+        
+        // Hàm format tiền với dấu phẩy ngăn cách hàng nghìn
+        function formatMoney(amount) {
+            return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " VNĐ";
+        }
+        
+        // Hàm format trọng lượng vàng theo đơn vị Việt Nam
+        function formatGoldWeight(weight) {
+            // Chuyển đổi sang số nguyên (đơn vị phần - thập phân của ly)
+            const weightInt = Math.floor(weight);
+            const weightDecimal = Math.round((weight - weightInt) * 1000) / 1000;
+            
+            // Tính các đơn vị
+            const luong = Math.floor(weightInt / 10000);
+            const chi = Math.floor((weightInt % 10000) / 1000);
+            const phan = Math.floor((weightInt % 1000) / 100);
+            const ly = Math.floor((weightInt % 100) / 10);
+            const phanLy = weightInt % 10;
+            
+            // Chuỗi định dạng
+            let result = '';
+            
+            if (luong > 0) {
+                result += `${luong}L`;
+            }
+            
+            if (chi > 0) {
+                result += `${chi}C`;
+            }
+            
+            if (phan > 0) {
+                result += `${phan}P`;
+            }
+            
+            if (ly > 0) {
+                result += `${ly}Ly`;
+            }
+            
+            if (phanLy > 0) {
+                result += `${phanLy}`;
+            }
+            
+            // Thêm phần thập phân nếu có
+            if (weightDecimal > 0) {
+                result += weightDecimal.toFixed(3).substring(1);
+            }
+            
+            // Format số thập phân
+            const decimal = Math.round((weight - Math.floor(weight)) * 1000) / 1000;
+            
+            // Format số nguyên
+            let formatted = '';
+            if (weight >= 10000) {
+                const luongDecimal = weight / 10000;
+                formatted = `${luongDecimal.toFixed(2)}L (${result})`;
+            } else if (weight >= 1000) {
+                const chiDecimal = weight / 1000;
+                formatted = `${chiDecimal.toFixed(3)}C (${result})`;
+            } else if (weight >= 100) {
+                const phanDecimal = weight / 100;
+                formatted = `${phanDecimal.toFixed(2)}P (${result})`;
+            } else if (weight >= 10) {
+                const lyDecimal = weight / 10;
+                formatted = `${lyDecimal.toFixed(2)}Ly (${result})`;
+            } else {
+                formatted = `${weight.toFixed(2)} (${result})`;
+            }
+            
+            return formatted;
+        }
+    </script>
+</body>
+</html>
