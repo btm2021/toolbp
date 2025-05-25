@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng dụng tính toán phân tách kim loại</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d4a574;
+            margin-bottom: 30px;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 40px;
+            height: 2px;
+            background-color: #ddd;
+            z-index: 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .timeline-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 10px;
+            transition: all 0.3s;
+        }
+
+        .timeline-item.active .timeline-circle {
+            background-color: #d4a574;
+            color: white;
+        }
+
+        .timeline-item.completed .timeline-circle {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .timeline-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .step-header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .step-header h2 {
+            color: #d4a574;
+            margin-bottom: 10px;
+        }
+
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .output-group {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .output-group h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .output-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        button {
+            background-color: #d4a574;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #b8935f;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .explanation {
+            background-color: #fffef0;
+            padding: 15px;
+            border-left: 4px solid #d4a574;
+            margin-bottom: 20px;
+        }
+
+        .requirements {
+            background-color: #f0fff0;
+            padding: 15px;
+            border-left: 4px solid #28a745;
+            margin-top: 20px;
+        }
+
+        .report {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .report h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quy trình phân tách kim loại vàng</h1>
+
+        <div class="timeline">
+            <div class="timeline-item active" data-step="1">
+                <div class="timeline-circle">1</div>
+                <div class="timeline-label">Hạ tuổi</div>
+            </div>
+            <div class="timeline-item" data-step="2">
+                <div class="timeline-circle">2</div>
+                <div class="timeline-label">Nấu</div>
+            </div>
+            <div class="timeline-item" data-step="3">
+                <div class="timeline-circle">3</div>
+                <div class="timeline-label">Thổi chì</div>
+            </div>
+            <div class="timeline-item" data-step="4">
+                <div class="timeline-circle">4</div>
+                <div class="timeline-label">Tách</div>
+            </div>
+            <div class="timeline-item" data-step="5">
+                <div class="timeline-circle">5</div>
+                <div class="timeline-label">Kho</div>
+            </div>
+            <div class="timeline-item" data-step="6">
+                <div class="timeline-circle">6</div>
+                <div class="timeline-label">Nấu lại vàng</div>
+            </div>
+            <div class="timeline-item" data-step="7">
+                <div class="timeline-circle">7</div>
+                <div class="timeline-label">Nấu lại bạc</div>
+            </div>
+            <div class="timeline-item" data-step="8">
+                <div class="timeline-circle">8</div>
+                <div class="timeline-label">Xuất report</div>
+            </div>
+        </div>
+
+        <!-- Bước 1: Hạ tuổi -->
+        <div class="step-content active" id="step-1">
+            <div class="step-header">
+                <h2>Bước 1: Hạ tuổi vàng</h2>
+                <p>Hạ tuổi vàng về mức 15% (150‰) so với vàng nguyên chất 100% (1000‰)</p>
+            </div>
+
+            <div class="explanation">
+                <h3>Giải thích:</h3>
+                <p>Quá trình hạ tuổi vàng là việc giảm hàm lượng vàng trong hợp kim bằng cách thêm bạc và chì. Mục tiêu là đạt được hàm lượng vàng 15% (150‰) để thuận lợi cho quá trình tách kim loại.</p>
+            </div>
+
+            <div class="calculator">
+                <h3>Máy tính hạ tuổi</h3>
+                <div class="input-group">
+                    <label>Tổng số lượng vàng ban đầu (chỉ):</label>
+                    <input type="number" id="initial-gold" placeholder="Ví dụ: 1000">
+                </div>
+                <div class="input-group">
+                    <label>Tuổi vàng ban đầu (‰):</label>
+                    <input type="number" id="initial-purity" placeholder="Ví dụ: 610">
+                </div>
+                <button onclick="calculateStep1()">Tính toán</button>
+
+                <div class="output-group" id="step1-output" style="display: none;">
+                    <h3>Kết quả:</h3>
+                    <div class="output-value">Số bạc cần thêm: <span id="silver-needed"></span></div>
+                    <div class="output-value">Số chì cần thêm: <span id="lead-needed"></span></div>
+                    <div class="output-value">Tổng trọng lượng sau hạ tuổi: <span id="total-weight"></span></div>
+                    <div class="output-value">Quy đổi ra gram: <span id="total-gram"></span></div>
+                </div>
+            </div>
+
+            <div class="requirements">
+                <h3>Yêu cầu sau bước này:</h3>
+                <ul>
+                    <li>Chuẩn bị đủ lượng bạc và chì theo tính toán</li>
+                    <li>Kiểm tra lại tổng trọng lượng hợp kim</li>
+                    <li>Chuẩn bị lò nấu cho bước tiếp theo</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bước 2: Nấu -->
+        <div class="step-content" id="step-2">
+            <div class="step-header">
+                <h2>Bước 2: Nấu hợp kim</h2>
+                <p>Nấu chảy hỗn hợp vàng, bạc và chì</p>
+            </div>
+
+            <div class="explanation">
+                <h3>Giải thích:</h3>
+                <p>Trong bước này, toàn bộ hợp kim được nấu chảy ở nhiệt độ cao để các kim loại hòa trộn đều với nhau. Quá trình này cần kiểm soát nhiệt độ chính xác.</p>
+            </div>
+
+            <div class="requirements">
+                <h3>Yêu cầu sau nấu:</h3>
+                <ul>
+                    <li>Nhiệt độ nấu: 1200-1300°C</li>
+                    <li>Thời gian nấu: 30-45 phút</li>
+                    <li>Khuấy đều hợp kim trong quá trình nấu</li>
+                    <li>Kiểm tra độ đồng nhất của hợp kim</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bước 3: Thổi chì -->
+        <div class="step-content" id="step-3">
+            <div class="step-header">
+                <h2>Bước 3: Thổi chì</h2>
+                <p>Loại bỏ chì khỏi hợp kim bằng phương pháp thổi oxy</p>
+            </div>
+
+            <div class="explanation">
+                <h3>Giải thích:</h3>
+                <p>Chì được loại bỏ bằng cách thổi oxy vào hợp kim nóng chảy. Chì sẽ bị oxy hóa thành PbO và bay hơi hoặc nổi lên bề mặt.</p>
+            </div>
+
+            <div class="requirements">
+                <h3>Yêu cầu sau thổi chì:</h3>
+                <ul>
+                    <li>Nhiệt độ duy trì: 900-1000°C</li>
+                    <li>Áp suất oxy: 2-3 bar</li>
+                    <li>Thời gian thổi: 20-30 phút</li>
+                    <li>Kiểm tra hàm lượng chì còn lại < 0.1%</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bước 4: Tách -->
+        <div class="step-content" id="step-4">
+            <div class="step-header">
+                <h2>Bước 4: Tách kim loại bằng axit</h2>
+                <p>Sử dụng axit HNO₃ để hòa tan bạc và tách vàng</p>
+            </div>
+
+            <div class="calculator">
+                <h3>Tính lượng axit và nước cần dùng</h3>
+                <div class="input-group">
+                    <label>Tổng trọng lượng hợp kim (gram):</label>
+                    <input type="number" id="alloy-weight" placeholder="Nhập trọng lượng">
+                </div>
+                <button onclick="calculateStep4()">Tính toán</button>
+
+                <div class="output-group" id="step4-output" style="display: none;">
+                    <h3>Kết quả:</h3>
+                    <div class="output-value">Lượng HNO₃ cần dùng: <span id="acid-needed"></span> ml</div>
+                    <div class="output-value">Lượng nước tinh khiết: <span id="water-needed"></span> ml</div>
+                </div>
+            </div>
+
+            <div class="requirements">
+                <h3>Yêu cầu sau tách:</h3>
+                <ul>
+                    <li>Nhiệt độ phản ứng: 60-80°C</li>
+                    <li>Thời gian phản ứng: 2-3 giờ</li>
+                    <li>Khuấy đều trong quá trình tách</li>
+                    <li>Thu hồi dung dịch bạc nitrat</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bước 5: Kho -->
+        <div class="step-content" id="step-5">
+            <div class="step-header">
+                <h2>Bước 5: Kho vàng</h2>
+                <p>Làm khô và tinh chế bột vàng</p>
+            </div>
+
+            <div class="explanation">
+                <h3>Giải thích:</h3>
+                <p>Bột vàng sau khi tách được rửa sạch nhiều lần với nước cất, sau đó sấy khô và nung để loại bỏ tạp chất còn lại.</p>
+            </div>
+
+            <div class="requirements">
+                <h3>Yêu cầu sau kho:</h3>
+                <ul>
+                    <li>Rửa bột vàng: 5-7 lần với nước cất</li>
+                    <li>Nhiệt độ sấy: 100-120°C</li>
+                    <li>Thời gian sấy: 2-3 giờ</li>
+                    <li>Kiểm tra độ tinh khiết > 99.5%</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bước 6: Nấu lại vàng -->
+        <div class="step-content" id="step-6">
+            <div class="step-header">
+                <h2>Bước 6: Nấu lại vàng</h2>
+                <p>Nấu lại bột vàng thành vàng khối</p>
+            </div>
+
+            <div class="calculator">
+                <h3>Tính hao hụt vàng</h3>
+                <div class="input-group">
+                    <label>Trọng lượng vàng thu được (chỉ):</label>
+                    <input type="number" id="recovered-gold" placeholder="Nhập trọng lượng">
+                </div>
+                <div class="input-group">
+                    <label>Tuổi vàng sau nấu (‰):</label>
+                    <input type="number" id="final-purity" placeholder="Ví dụ: 999">
+                </div>
+                <button onclick="calculateStep6()">Tính toán</button>
+
+                <div class="output-group" id="step6-output" style="display: none;">
+                    <h3>Kết quả:</h3>
+                    <div class="output-value">Vàng nguyên chất thu được: <span id="pure-gold"></span> chỉ</div>
+                    <div class="output-value">Hao hụt: <span id="gold-loss"></span> chỉ</div>
+                    <div class="output-value">Tỷ lệ hao hụt: <span id="loss-percentage"></span>%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bước 7: Nấu lại bạc -->
+        <div class="step-content" id="step-7">
+            <div class="step-header">
+                <h2>Bước 7: Nấu lại bạc</h2>
+                <p>Thu hồi bạc từ dung dịch bạc nitrat</p>
+            </div>
+
+            <div class="explanation">
+                <h3>Quy trình thu hồi bạc:</h3>
+                <ol>
+                    <li>Thêm NaCl để kết tủa AgCl</li>
+                    <li>Dùng NaOH để chuyển AgCl thành Ag</li>
+                    <li>Thêm Glycerin để cô đặc</li>
+                    <li>Lọc và nấu lại bạc</li>
+                </ol>
+            </div>
+
+            <div class="calculator">
+                <h3>Tính hao hụt bạc</h3>
+                <div class="input-group">
+                    <label>Lượng bạc thu được (chỉ):</label>
+                    <input type="number" id="recovered-silver" placeholder="Nhập trọng lượng">
+                </div>
+                <button onclick="calculateStep7()">Tính toán</button>
+
+                <div class="output-group" id="step7-output" style="display: none;">
+                    <h3>Kết quả:</h3>
+                    <div class="output-value">Bạc ban đầu: <span id="initial-silver"></span> chỉ</div>
+                    <div class="output-value">Bạc thu hồi: <span id="final-silver"></span> chỉ</div>
+                    <div class="output-value">Tỷ lệ hao hụt: <span id="silver-loss-percentage"></span>%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bước 8: Xuất report -->
+        <div class="step-content" id="step-8">
+            <div class="step-header">
+                <h2>Bước 8: Báo cáo tổng kết</h2>
+                <p>Tổng hợp kết quả của toàn bộ quy trình</p>
+            </div>
+
+            <div class="report" id="final-report">
+                <h3>Báo cáo chi tiết</h3>
+                <div class="report-item">
+                    <span>Vàng ban đầu:</span>
+                    <span id="report-initial-gold">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Tuổi vàng ban đầu:</span>
+                    <span id="report-initial-purity">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Bạc đã thêm:</span>
+                    <span id="report-silver-added">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Chì đã thêm:</span>
+                    <span id="report-lead-added">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Vàng thu hồi:</span>
+                    <span id="report-gold-recovered">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Tuổi vàng cuối:</span>
+                    <span id="report-final-purity">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Bạc thu hồi:</span>
+                    <span id="report-silver-recovered">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Tỷ lệ hao hụt vàng:</span>
+                    <span id="report-gold-loss">-</span>
+                </div>
+                <div class="report-item">
+                    <span>Tỷ lệ hao hụt bạc:</span>
+                    <span id="report-silver-loss">-</span>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="exportReport()">Xuất báo cáo</button>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button id="prevBtn" onclick="changeStep(-1)" disabled>Quay lại</button>
+            <button id="nextBtn" onclick="changeStep(1)">Tiếp theo</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 8;
+        
+        // Lưu trữ dữ liệu qua các bước
+        const processData = {
+            initialGold: 0,
+            initialPurity: 0,
+            silverAdded: 0,
+            leadAdded: 0,
+            totalWeight: 0,
+            goldRecovered: 0,
+            finalPurity: 0,
+            silverRecovered: 0
+        };
+
+        // Format số thành dạng có dấu phẩy
+        function formatNumber(num) {
+            return num.toLocaleString('vi-VN', { maximumFractionDigits: 3 });
+        }
+
+        // Chuyển đổi chỉ sang gram
+        function chiToGram(chi) {
+            return chi * 3.75;
+        }
+
+        // Bước 1: Tính toán hạ tuổi
+        function calculateStep1() {
+            const initialGold = parseFloat(document.getElementById('initial-gold').value) || 0;
+            const initialPurity = parseFloat(document.getElementById('initial-purity').value) || 0;
+
+            if (initialGold <= 0 || initialPurity <= 0) {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+                return;
+            }
+
+            // Tính tổng trọng lượng cần có để hạ tuổi về 150‰
+            const totalRequired = (initialGold * initialPurity) / 150;
+            const silverNeeded = totalRequired - initialGold;
+            const leadNeeded = initialGold * 1.2;
+            const totalWeight = initialGold + silverNeeded + leadNeeded;
+            const totalGram = chiToGram(totalWeight);
+
+            // Lưu dữ liệu
+            processData.initialGold = initialGold;
+            processData.initialPurity = initialPurity;
+            processData.silverAdded = silverNeeded;
+            processData.leadAdded = leadNeeded;
+            processData.totalWeight = totalWeight;
+
+            // Hiển thị kết quả
+            document.getElementById('silver-needed').textContent = formatNumber(silverNeeded) + ' chỉ';
+            document.getElementById('lead-needed').textContent = formatNumber(leadNeeded) + ' chỉ';
+            document.getElementById('total-weight').textContent = formatNumber(totalWeight) + ' chỉ';
+            document.getElementById('total-gram').textContent = formatNumber(totalGram) + ' gram';
+            
+            document.getElementById('step1-output').style.display = 'block';
+        }
+
+        // Bước 4: Tính lượng axit
+        function calculateStep4() {
+            const alloyWeight = parseFloat(document.getElementById('alloy-weight').value) || 0;
+
+            if (alloyWeight <= 0) {
+                alert('Vui lòng nhập trọng lượng hợp kim!');
+                return;
+            }
+
+            const acidNeeded = alloyWeight * 3;
+            const waterNeeded = alloyWeight * 3;
+
+            document.getElementById('acid-needed').textContent = formatNumber(acidNeeded);
+            document.getElementById('water-needed').textContent = formatNumber(waterNeeded);
+            
+            document.getElementById('step4-output').style.display = 'block';
+        }
+
+        // Bước 6: Tính hao hụt vàng
+        function calculateStep6() {
+            const recoveredGold = parseFloat(document.getElementById('recovered-gold').value) || 0;
+            const finalPurity = parseFloat(document.getElementById('final-purity').value) || 0;
+
+            if (recoveredGold <= 0 || finalPurity <= 0) {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+                return;
+            }
+
+            const pureGold = recoveredGold * (finalPurity / 1000);
+            const initialPureGold = processData.initialGold * (processData.initialPurity / 1000);
+            const goldLoss = initialPureGold - pureGold;
+            const lossPercentage = (goldLoss / initialPureGold) * 100;
+
+            processData.goldRecovered = recoveredGold;
+            processData.finalPurity = finalPurity;
+
+            document.getElementById('pure-gold').textContent = formatNumber(pureGold);
+            document.getElementById('gold-loss').textContent = formatNumber(goldLoss);
+            document.getElementById('loss-percentage').textContent = formatNumber(lossPercentage);
+            
+            document.getElementById('step6-output').style.display = 'block';
+        }
+
+        // Bước 7: Tính hao hụt bạc
+        function calculateStep7() {
+            const recoveredSilver = parseFloat(document.getElementById('recovered-silver').value) || 0;
+
+            if (recoveredSilver <= 0) {
+                alert('Vui lòng nhập lượng bạc thu được!');
+                return;
+            }
+
+            const initialSilver = processData.silverAdded;
+            const silverLoss = initialSilver - recoveredSilver;
+            const lossPercentage = (silverLoss / initialSilver) * 100;
+
+            processData.silverRecovered = recoveredSilver;
+
+            document.getElementById('initial-silver').textContent = formatNumber(initialSilver);
+            document.getElementById('final-silver').textContent = formatNumber(recoveredSilver);
+            document.getElementById('silver-loss-percentage').textContent = formatNumber(lossPercentage);
+            
+            document.getElementById('step7-output').style.display = 'block';
+        }
+
+        // Cập nhật report cuối cùng
+        function updateFinalReport() {
+            document.getElementById('report-initial-gold').textContent = formatNumber(processData.initialGold) + ' chỉ';
+            document.getElementById('report-initial-purity').textContent = processData.initialPurity + '‰';
+            document.getElementById('report-silver-added').textContent = formatNumber(processData.silverAdded) + ' chỉ';
+            document.getElementById('report-lead-added').textContent = formatNumber(processData.leadAdded) + ' chỉ';
+            document.getElementById('report-gold-recovered').textContent = formatNumber(processData.goldRecovered) + ' chỉ';
+            document.getElementById('report-final-purity').textContent = processData.finalPurity + '‰';
+            document.getElementById('report-silver-recovered').textContent = formatNumber(processData.silverRecovered) + ' chỉ';
+            
+            const goldLossPercent = ((processData.initialGold * processData.initialPurity / 1000 - processData.goldRecovered * processData.finalPurity / 1000) / (processData.initialGold * processData.initialPurity / 1000)) * 100;
+            const silverLossPercent = ((processData.silverAdded - processData.silverRecovered) / processData.silverAdded) * 100;
+            
+            document.getElementById('report-gold-loss').textContent = formatNumber(goldLossPercent) + '%';
+            document.getElementById('report-silver-loss').textContent = formatNumber(silverLossPercent) + '%';
+        }
+
+        // Chuyển bước
+        function changeStep(direction) {
+            const newStep = currentStep + direction;
+            
+            if (newStep >= 1 && newStep <= totalSteps) {
+                // Ẩn bước hiện tại
+                document.getElementById(`step-${currentStep}`).classList.remove('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+                
+                // Đánh dấu bước đã hoàn thành
+                if (direction > 0) {
+                    document.querySelector(`[data-step="${currentStep}"]`).classList.add('completed');
+                }
+                
+                // Hiển thị bước mới
+                currentStep = newStep;
+                document.getElementById(`step-${currentStep}`).classList.add('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+                
+                // Cập nhật nút
+                updateButtons();
+                
+                // Cập nhật report nếu đến bước cuối
+                if (currentStep === 8) {
+                    updateFinalReport();
+                }
+            }
+        }
+
+        // Cập nhật trạng thái nút
+        function updateButtons() {
+            document.getElementById('prevBtn').disabled = currentStep === 1;
+            document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'Hoàn thành' : 'Tiếp theo';
+        }
+
+        // Click vào timeline
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const step = parseInt(this.getAttribute('data-step'));
+                if (step <= currentStep) {
+                    document.getElementById(`step-${currentStep}`).classList.remove('active');
+                    document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+                    
+                    currentStep = step;
+                    document.getElementById(`step-${currentStep}`).classList.add('active');
+                    document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+                    
+                    updateButtons();
+                }
+            });
+        });
+
+        // Xuất report
+        function exportReport() {
+            const reportContent = document.getElementById('final-report').innerText;
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bao-cao-phan-tach-kim-loai.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
